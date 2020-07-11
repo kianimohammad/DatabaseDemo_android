@@ -8,13 +8,17 @@ import android.os.Bundle;
 import android.widget.ListView;
 
 import com.s20.databasedemo_android.model.Employee;
+import com.s20.databasedemo_android.util.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeActivity extends AppCompatActivity {
 
-    SQLiteDatabase sqLiteDatabase;
+//    SQLiteDatabase sqLiteDatabase;
+
+    // instance of DatabaseOpenHelper class
+    DatabaseHelper sqLiteDatabase;
 
     List<Employee> employeeList;
     ListView employeesListView;
@@ -27,13 +31,18 @@ public class EmployeeActivity extends AppCompatActivity {
         employeesListView = findViewById(R.id.lv_employees);
         employeeList = new ArrayList<>();
 
-        sqLiteDatabase = openOrCreateDatabase(MainActivity.DATABASE_NAME, MODE_PRIVATE, null);
+        //sqLiteDatabase = openOrCreateDatabase(MainActivity.DATABASE_NAME, MODE_PRIVATE, null);
+
+        sqLiteDatabase = new DatabaseHelper(this);
         loadEmployees();
     }
 
     private void loadEmployees() {
-        String sql = "SELECT * FROM employee";
-        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        /*String sql = "SELECT * FROM employee";
+        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);*/
+
+        Cursor cursor = sqLiteDatabase.getAllEmployees();
+
         if (cursor.moveToFirst()) {
             do {
                 // create an employee instance
