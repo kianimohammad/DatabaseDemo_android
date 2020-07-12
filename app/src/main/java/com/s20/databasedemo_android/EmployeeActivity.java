@@ -7,7 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.ListView;
 
-import com.s20.databasedemo_android.model.Employee;
+import com.s20.databasedemo_android.room.Employee;
+import com.s20.databasedemo_android.room.EmployeeRoomDb;
 import com.s20.databasedemo_android.util.DatabaseHelper;
 
 import java.util.ArrayList;
@@ -19,6 +20,9 @@ public class EmployeeActivity extends AppCompatActivity {
 
     // instance of DatabaseOpenHelper class
     DatabaseHelper sqLiteDatabase;
+
+    // Room db instance
+    private EmployeeRoomDb employeeRoomDb;
 
     List<Employee> employeeList;
     ListView employeesListView;
@@ -33,7 +37,10 @@ public class EmployeeActivity extends AppCompatActivity {
 
         //sqLiteDatabase = openOrCreateDatabase(MainActivity.DATABASE_NAME, MODE_PRIVATE, null);
 
-        sqLiteDatabase = new DatabaseHelper(this);
+//        sqLiteDatabase = new DatabaseHelper(this);
+
+        // Room
+        employeeRoomDb = EmployeeRoomDb.getInstance(this);
         loadEmployees();
     }
 
@@ -41,7 +48,7 @@ public class EmployeeActivity extends AppCompatActivity {
         /*String sql = "SELECT * FROM employee";
         Cursor cursor = sqLiteDatabase.rawQuery(sql, null);*/
 
-        Cursor cursor = sqLiteDatabase.getAllEmployees();
+        /*Cursor cursor = sqLiteDatabase.getAllEmployees();
 
         if (cursor.moveToFirst()) {
             do {
@@ -55,13 +62,25 @@ public class EmployeeActivity extends AppCompatActivity {
                 ));
             } while (cursor.moveToNext());
             cursor.close();
-        }
+        }*/
+
+        employeeList = employeeRoomDb.employeeDao().getAllEmployees();
+
 
         // create an adapter to display the employees
-        EmployeeAdapter employeeAdapter = new EmployeeAdapter(this,
+        /*EmployeeAdapter employeeAdapter = new EmployeeAdapter(this,
                 R.layout.list_layout_employee,
                 employeeList,
-                sqLiteDatabase);
+                sqLiteDatabase);*/
+        EmployeeAdapter employeeAdapter = new EmployeeAdapter(this, R.layout.list_layout_employee, employeeList);
         employeesListView.setAdapter(employeeAdapter);
     }
 }
+
+
+
+
+
+
+
+

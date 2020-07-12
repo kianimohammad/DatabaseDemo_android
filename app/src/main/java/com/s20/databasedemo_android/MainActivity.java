@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.s20.databasedemo_android.room.Employee;
+import com.s20.databasedemo_android.room.EmployeeRoomDb;
 import com.s20.databasedemo_android.util.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
@@ -24,6 +26,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // sqLite openHelper instance
     DatabaseHelper sqLiteDatabase;
+
+    private EmployeeRoomDb employeeRoomDb;
 
     EditText etName, etSalary;
     Spinner spinnerDept;
@@ -45,7 +49,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createTable();*/
 
         // initializing the instance of sqLLite openHelper class
-        sqLiteDatabase = new DatabaseHelper(this);
+//        sqLiteDatabase = new DatabaseHelper(this);
+
+        // Room db
+        employeeRoomDb = EmployeeRoomDb.getInstance(this);
     }
 
     /*private void createTable() {
@@ -97,12 +104,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 "VALUES (?, ?, ?, ?)";
         sqLiteDatabase.execSQL(sql, new String[]{name, department, joiningDate, salary});*/
 
+        /*
         // insert employee into database table with the help of database openHelper class
         if (sqLiteDatabase.addEmployee(name, department, joiningDate, Double.valueOf(salary)))
             Toast.makeText(this, "Employee Added", Toast.LENGTH_SHORT).show();
         else
             Toast.makeText(this, "Employee NOT Added", Toast.LENGTH_SHORT).show();
-
+*/
+        // Insert into room db
+        Employee employee = new Employee(name, department, joiningDate, Double.parseDouble(salary));
+        employeeRoomDb.employeeDao().insertEmployee(employee);
+        Toast.makeText(this, "Employee Added", Toast.LENGTH_SHORT).show();
 
     }
 

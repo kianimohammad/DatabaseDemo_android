@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.s20.databasedemo_android.model.Employee;
+import com.s20.databasedemo_android.room.Employee;
+import com.s20.databasedemo_android.room.EmployeeRoomDb;
 import com.s20.databasedemo_android.util.DatabaseHelper;
 
 import java.util.Arrays;
@@ -25,18 +27,30 @@ import java.util.List;
 
 public class EmployeeAdapter extends ArrayAdapter {
 
+    private static final String TAG = "EmployeeAdapter";
+
     Context context;
     int layoutRes;
     List<Employee> employeeList;
 //    SQLiteDatabase sqLiteDatabase;
     DatabaseHelper sqLiteDatabase;
+    EmployeeRoomDb employeeRoomDb;
 
-    public EmployeeAdapter(@NonNull Context context, int resource, List<Employee> employeeList, DatabaseHelper sqLiteDatabase) {
+
+//    public EmployeeAdapter(@NonNull Context context, int resource, List<Employee> employeeList, DatabaseHelper sqLiteDatabase) {
+//        super(context, resource, employeeList);
+//        this.employeeList = employeeList;
+//        this.sqLiteDatabase = sqLiteDatabase;
+//        this.context = context;
+//        this.layoutRes = resource;
+//    }
+
+    public EmployeeAdapter(@NonNull Context context, int resource, List<Employee> employeeList) {
         super(context, resource, employeeList);
         this.employeeList = employeeList;
-        this.sqLiteDatabase = sqLiteDatabase;
         this.context = context;
         this.layoutRes = resource;
+        employeeRoomDb = EmployeeRoomDb.getInstance(context);
     }
 
     @NonNull
@@ -103,8 +117,13 @@ public class EmployeeAdapter extends ArrayAdapter {
                         /*String sql = "UPDATE employee SET name = ?, department = ?, salary = ? WHERE id = ?";
                         sqLiteDatabase.execSQL(sql, new String[]{name, department, salary, String.valueOf(employee.getId())});*/
 
-                        if (sqLiteDatabase.updateEmployee(employee.getId(), name, department, Double.parseDouble(salary)))
-                            loadEmployees();
+                        /*if (sqLiteDatabase.updateEmployee(employee.getId(), name, department, Double.parseDouble(salary)))
+                            loadEmployees();*/
+
+                        // Room
+                        employeeRoomDb.employeeDao().updateEmployee(employee.getId(),
+                                name, department, Double.parseDouble(salary));
+                        loadEmployees();
                         alertDialog.dismiss();
                     }
                 });
@@ -125,8 +144,12 @@ public class EmployeeAdapter extends ArrayAdapter {
                     public void onClick(DialogInterface dialog, int which) {
                         /*String sql = "DELETE FROM employee WHERE id = ?";
                         sqLiteDatabase.execSQL(sql, new Integer[]{employee.getId()});*/
-                        if (sqLiteDatabase.deleteEmployee(employee.getId()))
-                            loadEmployees();
+                        /*if (sqLiteDatabase.deleteEmployee(employee.getId()))
+                            loadEmployees();*/
+                        // Room
+
+                        employeeRoomDb.employeeDao().deleteEmployee(employee.getId());
+                        loadEmployees();
                     }
                 });
                 builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -139,14 +162,20 @@ public class EmployeeAdapter extends ArrayAdapter {
                 alertDialog.show();
             }
         });
+        Log.d(TAG, "getView: " + getCount());
         return v;
+    }
+
+    @Override
+    public int getCount() {
+        return employeeList.size();
     }
 
     private void loadEmployees() {
         /*String sql = "SELECT * FROM employee";
         Cursor cursor = sqLiteDatabase.rawQuery(sql, null);*/
 
-        Cursor cursor = sqLiteDatabase.getAllEmployees();
+        /*Cursor cursor = sqLiteDatabase.getAllEmployees();
         employeeList.clear();
         if (cursor.moveToFirst()) {
             do {
@@ -160,7 +189,9 @@ public class EmployeeAdapter extends ArrayAdapter {
                 ));
             } while (cursor.moveToNext());
             cursor.close();
-        }
+        }*/
+
+        employeeList = employeeRoomDb.employeeDao().getAllEmployees();
         notifyDataSetChanged();
     }
 }
