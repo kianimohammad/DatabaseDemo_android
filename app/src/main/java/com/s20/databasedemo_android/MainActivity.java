@@ -2,6 +2,7 @@ package com.s20.databasedemo_android;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import com.s20.databasedemo_android.util.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sqLiteDatabase.execSQL(sql);
     }*/
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -85,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // getting the current time
         Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd hh:mm:ss", Locale.CANADA);
         String joiningDate = sdf.format(cal.getTime());
 
         if (name.isEmpty()) {
@@ -115,17 +118,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Employee employee = new Employee(name, department, joiningDate, Double.parseDouble(salary));
         employeeRoomDb.employeeDao().insertEmployee(employee);
         Toast.makeText(this, "Employee Added", Toast.LENGTH_SHORT).show();
-
+        clearFields();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
+        clearFields();
+    }
+
+    private void clearFields() {
         etName.setText("");
         etSalary.setText("");
         spinnerDept.setSelection(0);
+        etName.clearFocus();
         etSalary.clearFocus();
-        etName.requestFocus();
     }
 }
 
