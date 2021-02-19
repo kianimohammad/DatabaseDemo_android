@@ -58,7 +58,8 @@ public class EmployeeAdapter extends ArrayAdapter {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        View v = inflater.inflate(layoutRes, null);
+        View v = convertView;
+        if (v == null) v = inflater.inflate(layoutRes, null);
         TextView nameTV = v.findViewById(R.id.tv_name);
         TextView salaryTV = v.findViewById(R.id.tv_salary);
         TextView departmentTV = v.findViewById(R.id.tv_department);
